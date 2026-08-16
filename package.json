@@ -1,0 +1,27 @@
+{
+  "name": "wondermail",
+  "version": "1.0.0",
+  "description": "Deterministic Wonder Mail S password codec for Pokémon Mystery Dungeon: Red/Blue Rescue Team",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samlowe106/wondermail.git"
+  },
+  "keywords": [
+    "pokemon",
+    "mystery-dungeon",
+    "wonder-mail",
+    "rescue-team"
+  ]
+}
