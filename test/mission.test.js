@@ -1,6 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMission, readMission, REWARD_KINDS, WonderMailError, listDungeons, listItems, listPokemon } from '../src/index.js';
+import {
+  buildMission,
+  readMission,
+  REWARD_KINDS,
+  WonderMailError,
+  listDungeons,
+  listItems,
+  listObjectiveItems,
+  listPokemon
+} from '../src/index.js';
 
 /* Golden fixtures: known-good (input, expected password) pairs. If one of
    these starts failing, either a data table changed or the codec broke --
@@ -130,4 +139,16 @@ test('listing helpers return non-empty, well-formed data', () => {
   const pokemon = listPokemon();
   assert.ok(pokemon.some((p) => p.name === 'Nidoran♂'));
   assert.ok(pokemon.some((p) => p.name === 'Nidoran♀'));
+});
+
+test('listObjectiveItems excludes basic thrown weapons and Poké/Used TM, and can restrict to a dungeon', () => {
+  const all = listObjectiveItems();
+  assert.ok(!all.some((item) => item.id >= 1 && item.id <= 8));
+  assert.ok(!all.some((item) => item.name === 'POKé'));
+  assert.ok(!all.some((item) => item.name === 'Used TM'));
+  assert.ok(all.some((item) => item.name === 'Oran Berry'));
+
+  const inSilentChasm = listObjectiveItems({ dungeonId: 4 });
+  assert.ok(inSilentChasm.length < all.length);
+  assert.ok(inSilentChasm.every((item) => all.some((a) => a.id === item.id)));
 });

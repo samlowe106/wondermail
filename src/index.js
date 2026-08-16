@@ -9,6 +9,12 @@ import { POKEMON } from './data/pokemon.js';
 import { FRIEND_AREAS } from './data/friend-areas.js';
 import { isBadDungeon, isBadItem, isBadPokemon } from './filters.js';
 import { floorCount } from './difficulty.js';
+import { isItemInDungeon } from './dungeon-items.js';
+
+/* Basic thrown weapons (Stick..Geo Pebble), the Poké currency icon, and
+   "Used TM" are all real items but none of them are things an NPC would ever
+   ask you to find or deliver. */
+const NON_OBJECTIVE_ITEM_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 105, 124]);
 
 /** Selectable dungeons, in game order: {id, name, floors}. */
 export function listDungeons() {
@@ -25,6 +31,22 @@ export function listItems({ includeNothing = true } = {}) {
   const out = [];
   for (let id = includeNothing ? 0 : 1; id < ITEMS.length; id++) {
     if (isBadItem(id)) continue;
+    out.push({ id, name: ITEMS[id] });
+  }
+  return out;
+}
+
+/**
+ * Selectable "find item" / "deliver item" objectives. When `dungeonId` is
+ * given, results are further restricted to items that actually spawn in
+ * that dungeon (matches the "find item" mission type's own rule; "deliver
+ * item" has no such restriction, so omit `dungeonId` for that case).
+ */
+export function listObjectiveItems({ dungeonId } = {}) {
+  const out = [];
+  for (let id = 1; id < ITEMS.length; id++) {
+    if (isBadItem(id) || NON_OBJECTIVE_ITEM_IDS.has(id)) continue;
+    if (dungeonId !== undefined && !isItemInDungeon(id, dungeonId)) continue;
     out.push({ id, name: ITEMS[id] });
   }
   return out;
