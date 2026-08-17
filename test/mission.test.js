@@ -134,6 +134,8 @@ test('getDungeonDifficultyRange matches known dungeon difficulty ranges', () => 
   const dungeons = listDungeons();
   const tinyWoods = dungeons.find((d) => d.name === 'Tiny Woods');
   const fantasyStrait = dungeons.find((d) => d.name === 'Fantasy Strait');
+  assert.ok(tinyWoods, 'Tiny Woods should be a listed dungeon');
+  assert.ok(fantasyStrait, 'Fantasy Strait should be a listed dungeon');
 
   assert.deepEqual(getDungeonDifficultyRange(0, tinyWoods.id), {
     min: 0,
@@ -169,6 +171,8 @@ test('listDungeons carries a difficulty range per dungeon that reflects mission 
   const escort = listDungeons({ missionType: 2 });
   const tinyWoodsHelp = helpMe.find((d) => d.name === 'Tiny Woods');
   const tinyWoodsEscort = escort.find((d) => d.name === 'Tiny Woods');
+  assert.ok(tinyWoodsHelp, 'Tiny Woods should be listed for Help me missions');
+  assert.ok(tinyWoodsEscort, 'Tiny Woods should be listed for Escort missions');
   assert.equal(tinyWoodsHelp.difficulty.label, 'E');
   assert.equal(tinyWoodsEscort.difficulty.min > tinyWoodsHelp.difficulty.min, true);
 });
