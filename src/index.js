@@ -28,6 +28,7 @@ const NON_OBJECTIVE_ITEM_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 105, 124]);
  * `difficulty` is the {min, max, label} range from getDungeonDifficultyRange
  * for the given mission type (defaults to a non-escort mission; pass 2 for
  * escort missions, which run two notches harder throughout).
+ * @param {{ missionType?: number }} [options]
  */
 export function listDungeons({ missionType = 0 } = {}) {
   const out = [];
@@ -38,7 +39,10 @@ export function listDungeons({ missionType = 0 } = {}) {
   return out;
 }
 
-/** Selectable items (id 0 = "Nothing", used as a "no item" placeholder). */
+/**
+ * Selectable items (id 0 = "Nothing", used as a "no item" placeholder).
+ * @param {{ includeNothing?: boolean }} [options]
+ */
 export function listItems({ includeNothing = true } = {}) {
   const out = [];
   for (let id = includeNothing ? 0 : 1; id < ITEMS.length; id++) {
@@ -53,6 +57,7 @@ export function listItems({ includeNothing = true } = {}) {
  * given, results are further restricted to items that actually spawn in
  * that dungeon (matches the "find item" mission type's own rule; "deliver
  * item" has no such restriction, so omit `dungeonId` for that case).
+ * @param {{ dungeonId?: number }} [options]
  */
 export function listObjectiveItems({ dungeonId } = {}) {
   const out = [];

@@ -1,5 +1,6 @@
 /* Mission flavor text: titles and bodies used to fill in the mail preview. */
 
+/** @type {[number, number, string][]} */
 export const PARENT_CHILD = [
  [
   15,
@@ -108,6 +109,7 @@ export const PARENT_CHILD = [
  ]
 ];
 
+/** @type {[number, number, string, string][]} */
 export const PAIRS = [
  [
   103,

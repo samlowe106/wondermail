@@ -29,6 +29,28 @@ export const REWARD_KINDS = {
 
 export class WonderMailError extends Error {}
 
+/** @typedef {import('./codec.js').PassArray} PassArray */
+
+/**
+ * @typedef {object} Mission
+ * @property {string} password
+ * @property {[string, string]} passwordDisplay
+ * @property {{ id: number, name: string, needsTarget: boolean, needsItem: boolean }} missionType
+ * @property {{ id: number, name: string }} client
+ * @property {{ id: number, name: string }} target
+ * @property {{ id: number, name: string }} item
+ * @property {{ id: number, name: string }} dungeon
+ * @property {number} floor
+ * @property {string} floorLabel
+ * @property {number} difficulty
+ * @property {string} difficultyStars
+ * @property {string} reward
+ * @property {string} objective
+ * @property {string} mailTitle
+ * @property {string[]} mailBody
+ * @property {PassArray} passArray
+ */
+
 /**
  * @param {object} input
  * @param {number} input.missionType - index into MISSION_TYPES
@@ -37,8 +59,9 @@ export class WonderMailError extends Error {}
  * @param {number} input.client - client Pokémon id
  * @param {number} [input.target] - target/escort Pokémon id (find someone / escort)
  * @param {number} [input.item] - item id to find/deliver (find item / deliver item)
- * @param {{kind: string, item?: number, friendArea?: number}} input.reward
+ * @param {{kind: string, item?: number, friendArea?: number}} [input.reward] - defaults to money-only
  * @param {number} [input.variant] - 0-255, picks which valid flavor-text line is used; same inputs + same variant always produce the same password
+ * @returns {Mission}
  */
 export function buildMission(input) {
   const missionType = MISSION_TYPES[input.missionType];
@@ -61,7 +84,7 @@ export function buildMission(input) {
   pass[5] = input.floor;
   pass[12] = input.client & 0xff;
   pass[13] = (input.client >> 8) & 0xff;
-  const targetId = missionType.needsTarget ? input.target : input.client;
+  const targetId = (missionType.needsTarget ? input.target : input.client) ?? input.client;
   pass[14] = targetId & 0xff;
   pass[15] = (targetId >> 8) & 0xff;
   pass[16] = missionType.needsItem ? input.item : 9;
@@ -92,6 +115,7 @@ export function buildMission(input) {
 }
 
 /** Decodes a Wonder Mail password string into the same preview shape buildMission returns. */
+/** @param {string} password @returns {Mission} */
 export function readMission(password) {
   const pass = decodePassword(password);
   if (!pass || pass[0] !== 5 || pass[1] > 4) {
@@ -100,6 +124,7 @@ export function readMission(password) {
   return describeMission(pass);
 }
 
+/** @param {PassArray} pass @param {number} difficulty @returns {string} */
 function rewardDescription(pass, difficulty) {
   const baseMoney = (difficulty + 1) * 100;
   switch (pass[17]) {
@@ -116,6 +141,14 @@ function rewardDescription(pass, difficulty) {
   }
 }
 
+/**
+ * @param {PassArray} pass
+ * @param {number} objectiveCode
+ * @param {string} clientName
+ * @param {string} targetName
+ * @param {string} itemName
+ * @returns {string}
+ */
 function objectiveDescription(pass, objectiveCode, clientName, targetName, itemName) {
   switch (objectiveCode) {
     case 0:
@@ -137,6 +170,7 @@ function objectiveDescription(pass, objectiveCode, clientName, targetName, itemN
   }
 }
 
+/** @param {PassArray} pass @returns {Mission} */
 function describeMission(pass) {
   const password = encodePassword(pass);
   const flavor = describeFlavor(pass);
