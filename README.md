@@ -1,6 +1,6 @@
 # Wondermail
 
-A dependency-free JavaScript library for building and reading Wonder Mail passwords from *Pokémon Mystery Dungeon: Red Rescue Team* / *Blue Rescue Team*. Other Mystery Dungeon games are currently **not supported**, although I may choose to support them in the future.
+A JavaScript library for building and reading Wonder Mail passwords from *Pokémon Mystery Dungeon: Red Rescue Team* / *Blue Rescue Team*. Other Mystery Dungeon games are currently **not supported**, although I may choose to support them in the future. Wondermail is dependency-free except for an optional typechecker.
 
 ```js
 import { buildMission, REWARD_KINDS } from 'wondermail';
