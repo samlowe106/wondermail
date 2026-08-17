@@ -16,6 +16,13 @@ export function getDifficulty(missionType, dungeonId, floor) {
   return Math.min(rating, 6);
 }
 
+/* The in-game letter grade for each of getDifficulty's 0-6 outputs. */
+export const DIFFICULTY_LETTERS = ['E', 'D', 'C', 'B', 'A', 'S', '*'];
+
+export function getDifficultyLetter(difficulty) {
+  return DIFFICULTY_LETTERS[difficulty] ?? DIFFICULTY_LETTERS[DIFFICULTY_LETTERS.length - 1];
+}
+
 export function isAboveGround(dungeonId) {
   if (dungeonId >= ABOVE_GROUND.length) return true;
   return Boolean(ABOVE_GROUND[dungeonId]);
@@ -23,4 +30,27 @@ export function isAboveGround(dungeonId) {
 
 export function floorCount(dungeonId) {
   return FLOORS_PER_DUNGEON[dungeonId] || 0;
+}
+
+/* The lowest and highest difficulty a mission can land on across every
+   floor of a dungeon, for the given mission type (escort missions run two
+   notches harder throughout, so the range shifts with it). Useful for
+   showing e.g. "Tiny Woods (E)" or "Fantasy Strait (B-A)" in a dungeon list. */
+export function getDungeonDifficultyRange(missionType, dungeonId) {
+  const floors = floorCount(dungeonId);
+  let min = Infinity;
+  let max = -Infinity;
+  for (let floor = 1; floor < floors; floor++) {
+    const difficulty = getDifficulty(missionType, dungeonId, floor);
+    if (difficulty < min) min = difficulty;
+    if (difficulty > max) max = difficulty;
+  }
+  if (min > max) min = max = 0;
+  return {
+    min,
+    max,
+    minLetter: getDifficultyLetter(min),
+    maxLetter: getDifficultyLetter(max),
+    label: min === max ? getDifficultyLetter(min) : `${getDifficultyLetter(min)}-${getDifficultyLetter(max)}`
+  };
 }

@@ -1,6 +1,13 @@
 export { buildMission, readMission, MISSION_TYPES, REWARD_KINDS, WonderMailError } from './mission.js';
 export { encodePassword, decodePassword, formatPasswordForDisplay, normalizePasswordInput } from './codec.js';
-export { getDifficulty, isAboveGround, floorCount } from './difficulty.js';
+export {
+  getDifficulty,
+  getDifficultyLetter,
+  getDungeonDifficultyRange,
+  isAboveGround,
+  floorCount,
+  DIFFICULTY_LETTERS
+} from './difficulty.js';
 export { isItemInDungeon } from './dungeon-items.js';
 export { isBadDungeon, isBadItem, isBadPokemon, getBaseSpecies } from './filters.js';
 
@@ -8,7 +15,7 @@ import { ITEMS, DUNGEONS } from './data/items.js';
 import { POKEMON } from './data/pokemon.js';
 import { FRIEND_AREAS } from './data/friend-areas.js';
 import { isBadDungeon, isBadItem, isBadPokemon } from './filters.js';
-import { floorCount } from './difficulty.js';
+import { floorCount, getDungeonDifficultyRange } from './difficulty.js';
 import { isItemInDungeon } from './dungeon-items.js';
 
 /* Basic thrown weapons (Stick..Geo Pebble), the Poké currency icon, and
@@ -16,12 +23,17 @@ import { isItemInDungeon } from './dungeon-items.js';
    ask you to find or deliver. */
 const NON_OBJECTIVE_ITEM_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 105, 124]);
 
-/** Selectable dungeons, in game order: {id, name, floors}. */
-export function listDungeons() {
+/**
+ * Selectable dungeons, in game order: {id, name, floors, difficulty}, where
+ * `difficulty` is the {min, max, label} range from getDungeonDifficultyRange
+ * for the given mission type (defaults to a non-escort mission; pass 2 for
+ * escort missions, which run two notches harder throughout).
+ */
+export function listDungeons({ missionType = 0 } = {}) {
   const out = [];
   for (let id = 0; id < DUNGEONS.length; id++) {
     if (isBadDungeon(id)) continue;
-    out.push({ id, name: DUNGEONS[id], floors: floorCount(id) });
+    out.push({ id, name: DUNGEONS[id], floors: floorCount(id), difficulty: getDungeonDifficultyRange(missionType, id) });
   }
   return out;
 }

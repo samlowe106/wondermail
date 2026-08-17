@@ -8,7 +8,9 @@ import {
   listDungeons,
   listItems,
   listObjectiveItems,
-  listPokemon
+  listPokemon,
+  getDungeonDifficultyRange,
+  getDifficultyLetter
 } from '../src/index.js';
 
 /* Golden fixtures: known-good (input, expected password) pairs. If one of
@@ -126,6 +128,49 @@ test('buildMission rejects an item that cannot appear in the chosen dungeon', ()
     () => buildMission({ missionType: 3, dungeon: 0, floor: 1, client: 25, item: 240, reward: { kind: REWARD_KINDS.MONEY_ONLY } }),
     WonderMailError
   );
+});
+
+test('getDungeonDifficultyRange matches known dungeon difficulty ranges', () => {
+  const dungeons = listDungeons();
+  const tinyWoods = dungeons.find((d) => d.name === 'Tiny Woods');
+  const fantasyStrait = dungeons.find((d) => d.name === 'Fantasy Strait');
+
+  assert.deepEqual(getDungeonDifficultyRange(0, tinyWoods.id), {
+    min: 0,
+    max: 0,
+    minLetter: 'E',
+    maxLetter: 'E',
+    label: 'E'
+  });
+  assert.deepEqual(getDungeonDifficultyRange(0, fantasyStrait.id), {
+    min: 3,
+    max: 4,
+    minLetter: 'B',
+    maxLetter: 'A',
+    label: 'B-A'
+  });
+
+  // Escort missions run two notches harder throughout, so the range shifts up.
+  const escortRange = getDungeonDifficultyRange(2, fantasyStrait.id);
+  assert.equal(escortRange.min, 4);
+  assert.equal(escortRange.max, 5);
+  assert.equal(escortRange.label, 'A-S');
+});
+
+test('getDifficultyLetter matches the in-game E..S/* scale', () => {
+  assert.equal(getDifficultyLetter(0), 'E');
+  assert.equal(getDifficultyLetter(4), 'A');
+  assert.equal(getDifficultyLetter(5), 'S');
+  assert.equal(getDifficultyLetter(6), '*');
+});
+
+test('listDungeons carries a difficulty range per dungeon that reflects mission type', () => {
+  const helpMe = listDungeons({ missionType: 0 });
+  const escort = listDungeons({ missionType: 2 });
+  const tinyWoodsHelp = helpMe.find((d) => d.name === 'Tiny Woods');
+  const tinyWoodsEscort = escort.find((d) => d.name === 'Tiny Woods');
+  assert.equal(tinyWoodsHelp.difficulty.label, 'E');
+  assert.equal(tinyWoodsEscort.difficulty.min > tinyWoodsHelp.difficulty.min, true);
 });
 
 test('listing helpers return non-empty, well-formed data', () => {
