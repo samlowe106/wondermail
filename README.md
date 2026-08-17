@@ -1,9 +1,6 @@
-# wondermail
+# Wondermail
 
-A dependency-free JS library for building and reading **Wonder Mail S**
-passwords for *Pokémon Mystery Dungeon: Red Rescue Team* / *Blue Rescue Team*
-(GBA/DS) — the 24-character codes players type in to receive a rescue
-mission.
+A dependency-free JavaScript library for building and reading Wonder Mail passwords from *Pokémon Mystery Dungeon: Red Rescue Team* / *Blue Rescue Team*. Other Mystery Dungeon games are currently **not supported**, although I may choose to support them in the future.
 
 ```js
 import { buildMission, REWARD_KINDS } from 'wondermail';
@@ -29,46 +26,21 @@ import { readMission } from 'wondermail';
 readMission('??JNS4+?4P6?2F?864?6P??W');
 ```
 
-## Why this exists
+## Features
 
-A handful of Wonder Mail generator sites have existed for years, all
-descending from the same reverse-engineered format. Two things bothered me
-about them:
-
-- **They're non-deterministic.** One field in the password (which specific
-  line of in-mission flavor text gets shown) is picked with `Math.random()`
-  at generation time, so typing in the exact same mission twice produces a
-  different password each time. That field turns out to have **zero effect**
-  on the mission itself — dungeon, floor, client, reward, all of it stay
-  identical — it only reshuffles which line of filler dialog shows up. This
-  library makes that byte a deterministic function of the mission (defaulting
-  to a fixed value), with an optional `variant` (0-255) if you want to see a
-  different valid line on purpose.
-- **They render male/female/ellipsis Pokémon names and dialog as ASCII
-  placeholders** (`#`, `%`, `.`) instead of the real symbols (♂, ♀, …) the
-  password's own character set actually represents, and that the DS's own
-  font — and keyboard — render/support directly.
-
-## What this is not
-
-This only covers Wonder Mail S for Red/Blue Rescue Team. It doesn't cover the
-Nintendo DS Wonder Mail (Explorers of Time/Darkness/Sky) or Gates to
-Infinity's Wonder Mail RR format — those are different, unrelated password
-schemes.
+- **No dependencies**: the JavaScript ecosystem is [not very good](https://en.wikipedia.org/wiki/Npm#Package_controversies) (to put it lightly), so I've written this package with no dependencies.
+- **Deterministic**: all fields are generated deterministically, so the same inputs yield the same outputs every time. (Some other websites choose the flavor text randomly each time.)
+- **Proper rendering** of the game's symbols (♂, ♀, …).
+- **Alphabetical sorting** of mission rewards for convenience.
 
 ## API
 
 See [`src/index.js`](src/index.js) for the full surface. The short version:
 
-- `buildMission(input)` — build a mission and get back `{ password,
-  passwordDisplay, mailTitle, mailBody, reward, difficulty, ... }`.
-- `readMission(password)` — decode a password into the same shape.
-- `listDungeons()`, `listItems()`, `listPokemon()`, `listFriendAreas()` —
-  menu-ready option lists, already filtered down to what's actually legal
-  (some ids in the raw game data are unused engine slots or alternate
-  formes).
-- `encodePassword` / `decodePassword` — the raw codec, if you already have a
-  mission encoded as a 20-element array.
+- `buildMission(input)` to build a mission and get back `{ password, passwordDisplay, mailTitle, mailBody, reward, difficulty, ... }`.
+- `readMission(password)` decodes a password into the same shape.
+- `listDungeons()`, `listItems()`, `listPokemon()`, `listFriendAreas()` are menu-ready option lists, already filtered down to what's actually legal (some ids in the raw game data are unused engine slots or alternate forms).
+- `encodePassword` / `decodePassword` is the raw codec, if you already have a mission encoded as a 20-element array.
 
 ## Testing
 
@@ -76,11 +48,8 @@ See [`src/index.js`](src/index.js) for the full surface. The short version:
 npm test
 ```
 
-The test suite includes golden fixtures (known inputs -> known passwords)
-and round-trip checks. The codec and flavor-text logic were additionally
-cross-checked field-for-field against a reference implementation across
-thousands of randomized cases during development.
+The test suite includes golden fixtures (known inputs -> known passwords) and round-trip checks. The codec and flavor-text logic were additionally cross-checked field-for-field against a reference implementation across thousands of randomized cases during development. Obviously, nothing replaces human testing and inputting the codes into the games yourself.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Wondermail is licensed under the [MIT license](LICENSE).
