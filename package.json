@@ -11,7 +11,8 @@
     "src"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "typecheck": "tsc"
   },
   "license": "MIT",
   "repository": {
@@ -23,5 +24,9 @@
     "mystery-dungeon",
     "wonder-mail",
     "rescue-team"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
 }
